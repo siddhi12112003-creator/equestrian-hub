@@ -1,22 +1,30 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Horse Riding Academy Management API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: horses
+    description: Horse registry operations
+  - name: riders
+    description: Rider profile operations
+  - name: sessions
+    description: Session scheduling operations
+  - name: attendance
+    description: Attendance tracking operations
+  - name: dashboard
+    description: Dashboard summary operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +32,370 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /horses:
+    get:
+      operationId: listHorses
+      tags: [horses]
+      summary: List all horses
+      responses:
+        "200":
+          description: List of horses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Horse"
+    post:
+      operationId: createHorse
+      tags: [horses]
+      summary: Create a new horse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HorseInput"
+      responses:
+        "201":
+          description: Created horse
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Horse"
+
+  /horses/{id}:
+    get:
+      operationId: getHorse
+      tags: [horses]
+      summary: Get a horse by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Horse
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Horse"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateHorse
+      tags: [horses]
+      summary: Update a horse
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HorseUpdate"
+      responses:
+        "200":
+          description: Updated horse
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Horse"
+    delete:
+      operationId: deleteHorse
+      tags: [horses]
+      summary: Delete a horse
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /riders:
+    get:
+      operationId: listRiders
+      tags: [riders]
+      summary: List all riders
+      responses:
+        "200":
+          description: List of riders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Rider"
+    post:
+      operationId: createRider
+      tags: [riders]
+      summary: Create a new rider
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RiderInput"
+      responses:
+        "201":
+          description: Created rider
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rider"
+
+  /riders/{id}:
+    get:
+      operationId: getRider
+      tags: [riders]
+      summary: Get a rider by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Rider
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rider"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateRider
+      tags: [riders]
+      summary: Update a rider
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RiderUpdate"
+      responses:
+        "200":
+          description: Updated rider
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rider"
+    delete:
+      operationId: deleteRider
+      tags: [riders]
+      summary: Delete a rider
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /sessions:
+    get:
+      operationId: listSessions
+      tags: [sessions]
+      summary: List all sessions
+      responses:
+        "200":
+          description: List of sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
+    post:
+      operationId: createSession
+      tags: [sessions]
+      summary: Create a new session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionInput"
+      responses:
+        "201":
+          description: Created session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+
+  /sessions/{id}:
+    get:
+      operationId: getSession
+      tags: [sessions]
+      summary: Get a session by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateSession
+      tags: [sessions]
+      summary: Update a session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionUpdate"
+      responses:
+        "200":
+          description: Updated session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+    delete:
+      operationId: deleteSession
+      tags: [sessions]
+      summary: Delete a session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /sessions/{id}/attendance:
+    get:
+      operationId: getSessionAttendance
+      tags: [attendance]
+      summary: Get attendance for a session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Attendance list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AttendanceRecord"
+
+  /attendance:
+    get:
+      operationId: listAttendance
+      tags: [attendance]
+      summary: List all attendance records
+      responses:
+        "200":
+          description: Attendance records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AttendanceRecord"
+    post:
+      operationId: upsertAttendance
+      tags: [attendance]
+      summary: Mark attendance for a session/rider
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AttendanceInput"
+      responses:
+        "200":
+          description: Attendance record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AttendanceRecord"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary stats
+      responses:
+        "200":
+          description: Summary statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/upcoming-sessions:
+    get:
+      operationId: getUpcomingSessions
+      tags: [dashboard]
+      summary: Get upcoming sessions (next 7 days)
+      responses:
+        "200":
+          description: Upcoming sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
+
+  /dashboard/health-breakdown:
+    get:
+      operationId: getHealthBreakdown
+      tags: [dashboard]
+      summary: Get horse health status breakdown
+      responses:
+        "200":
+          description: Health breakdown counts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HealthBreakdownItem"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +403,201 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    Horse:
+      type: object
+      required: [id, name, breed, age, healthStatus, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        breed:
+          type: string
+        age:
+          type: integer
+        healthStatus:
+          type: string
+          enum: [healthy, under_treatment, retired]
+        createdAt:
+          type: string
+
+    HorseInput:
+      type: object
+      required: [name, breed, age, healthStatus]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        breed:
+          type: string
+          minLength: 1
+        age:
+          type: integer
+          minimum: 0
+        healthStatus:
+          type: string
+          enum: [healthy, under_treatment, retired]
+
+    HorseUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        breed:
+          type: string
+        age:
+          type: integer
+          minimum: 0
+        healthStatus:
+          type: string
+          enum: [healthy, under_treatment, retired]
+
+    Rider:
+      type: object
+      required: [id, name, level, contact, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced, professional]
+        contact:
+          type: string
+        createdAt:
+          type: string
+
+    RiderInput:
+      type: object
+      required: [name, level, contact]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced, professional]
+        contact:
+          type: string
+          minLength: 1
+
+    RiderUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced, professional]
+        contact:
+          type: string
+
+    Session:
+      type: object
+      required: [id, riderId, horseId, sessionDate, sessionTime, notes, riderName, horseName, createdAt]
+      properties:
+        id:
+          type: integer
+        riderId:
+          type: integer
+        horseId:
+          type: integer
+        sessionDate:
+          type: string
+        sessionTime:
+          type: string
+        notes:
+          type: ["string", "null"]
+        riderName:
+          type: string
+        horseName:
+          type: string
+        createdAt:
+          type: string
+
+    SessionInput:
+      type: object
+      required: [riderId, horseId, sessionDate, sessionTime]
+      properties:
+        riderId:
+          type: integer
+        horseId:
+          type: integer
+        sessionDate:
+          type: string
+        sessionTime:
+          type: string
+        notes:
+          type: string
+
+    SessionUpdate:
+      type: object
+      properties:
+        riderId:
+          type: integer
+        horseId:
+          type: integer
+        sessionDate:
+          type: string
+        sessionTime:
+          type: string
+        notes:
+          type: string
+
+    AttendanceRecord:
+      type: object
+      required: [id, sessionId, riderId, present, riderName, sessionDate]
+      properties:
+        id:
+          type: integer
+        sessionId:
+          type: integer
+        riderId:
+          type: integer
+        present:
+          type: boolean
+        riderName:
+          type: string
+        sessionDate:
+          type: string
+
+    AttendanceInput:
+      type: object
+      required: [sessionId, riderId, present]
+      properties:
+        sessionId:
+          type: integer
+        riderId:
+          type: integer
+        present:
+          type: boolean
+
+    DashboardSummary:
+      type: object
+      required: [totalHorses, totalRiders, totalSessions, upcomingSessionsCount, presentToday, attendanceRate]
+      properties:
+        totalHorses:
+          type: integer
+        totalRiders:
+          type: integer
+        totalSessions:
+          type: integer
+        upcomingSessionsCount:
+          type: integer
+        presentToday:
+          type: integer
+        attendanceRate:
+          type: number
+
+    HealthBreakdownItem:
+      type: object
+      required: [status, count]
+      properties:
+        status:
+          type: string
+        count:
+          type: integer
