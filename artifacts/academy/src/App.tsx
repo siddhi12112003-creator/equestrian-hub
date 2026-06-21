@@ -1,21 +1,26 @@
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation, Redirect } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, SidebarGroup, SidebarGroupContent } from "@/components/ui/sidebar";
-import { LayoutDashboard, ListIcon, Users, Calendar, CheckSquare } from "lucide-react";
-import { Link, useLocation } from "wouter";
+import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, SidebarGroup, SidebarGroupContent, SidebarFooter } from "@/components/ui/sidebar";
+import { LayoutDashboard, ListIcon, Users, Calendar, CheckSquare, LogOut } from "lucide-react";
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
 import Horses from "@/pages/Horses";
 import Riders from "@/pages/Riders";
 import Sessions from "@/pages/Sessions";
 import Attendance from "@/pages/Attendance";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
 function AppSidebar() {
   const [location] = useLocation();
+  const { user, logout } = useAuth();
 
   const links = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -40,13 +45,13 @@ function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="gap-2">
               {links.map((link) => {
-                const isActive = location === link.href || (link.href !== '/' && location.startsWith(link.href));
+                const isActive = location === link.href || (link.href !== "/" && location.startsWith(link.href));
                 return (
                   <SidebarMenuItem key={link.href}>
                     <SidebarMenuButton
                       asChild
                       isActive={isActive}
-                      className={`h-10 transition-colors ${isActive ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium' : 'text-sidebar-foreground hover:bg-sidebar-accent/50'}`}
+                      className={`h-10 transition-colors ${isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground hover:bg-sidebar-accent/50"}`}
                     >
                       <Link href={link.href} className="flex items-center gap-3">
                         <link.icon className="h-5 w-5" />
@@ -60,6 +65,25 @@ function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="border-t border-sidebar-border bg-sidebar p-4">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+            <span className="text-xs font-bold text-primary-foreground uppercase">
+              {user?.username?.[0] ?? "?"}
+            </span>
+          </div>
+          <span className="text-sm font-medium text-sidebar-foreground truncate">{user?.username}</span>
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+          onClick={() => logout()}
+        >
+          <LogOut className="h-4 w-4" />
+          Sign out
+        </Button>
+      </SidebarFooter>
     </Sidebar>
   );
 }
@@ -83,21 +107,60 @@ function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-muted-foreground text-sm">Loading...</div>
+      </div>
+    );
+  }
+  if (!user) return <Redirect to="/login" />;
+  return (
+    <Layout>
+      <Component />
+    </Layout>
+  );
+}
+
+function AppRoutes() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-muted-foreground text-sm">Loading...</div>
+      </div>
+    );
+  }
+
+  return (
+    <Switch>
+      <Route path="/login">
+        {user ? <Redirect to="/" /> : <Login />}
+      </Route>
+      <Route path="/register">
+        {user ? <Redirect to="/" /> : <Register />}
+      </Route>
+      <Route path="/" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/horses" component={() => <ProtectedRoute component={Horses} />} />
+      <Route path="/riders" component={() => <ProtectedRoute component={Riders} />} />
+      <Route path="/sessions" component={() => <ProtectedRoute component={Sessions} />} />
+      <Route path="/attendance" component={() => <ProtectedRoute component={Attendance} />} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Layout>
-            <Switch>
-              <Route path="/" component={Dashboard} />
-              <Route path="/horses" component={Horses} />
-              <Route path="/riders" component={Riders} />
-              <Route path="/sessions" component={Sessions} />
-              <Route path="/attendance" component={Attendance} />
-              <Route component={NotFound} />
-            </Switch>
-          </Layout>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
         </WouterRouter>
         <Toaster />
       </TooltipProvider>
